@@ -29,6 +29,9 @@ const ROOM_NAMES: Record<Room, string> = {
   kitchen: "부엌",
 };
 
+const POSITION_WORDS = ["위", "아래", "앞", "뒤", "옆", "안", "사이"] as const;
+const AUDIO_VERSION = "20260718-4";
+
 const STEPS = [
   { room: "bedroom", parts: [["열쇠", false], ["는 ", true], ["책상 ", false], ["위에 있어요", true], [".", false]], target: "key", item: "열쇠" },
   { room: "bedroom", parts: [["비밀번호 쪽지", false], ["는 ", true], ["액자 ", false], ["뒤에 있어요", true], [".", false]], target: "frame", item: "비밀번호 쪽지" },
@@ -42,7 +45,7 @@ const STEPS = [
   { room: "living", parts: [["부엌 문", false], ["은 ", true], ["텔레비전 ", false], ["옆에 있어요", true], [".", false]], target: "kitchen-door", item: "부엌 이동", collect: false },
   { room: "kitchen", parts: [["컵", false], ["은 ", true], ["찬장 ", false], ["안에 있어요", true], [".", false]], target: "cabinet", item: "컵" },
   { room: "kitchen", parts: [["타이머", false], ["는 ", true], ["냉장고 ", false], ["위에 있어요", true], [".", false]], target: "timer", item: "타이머" },
-  { room: "kitchen", parts: [["거실 문", false], ["은 ", true], ["냉장고 ", false], ["옆에 있어요", true], [".", false]], target: "living-door", item: "거실 이동", collect: false },
+  { room: "kitchen", parts: [["거실 문", false], ["은 ", true], ["싱크대 ", false], ["옆에 있어요", true], [".", false]], target: "living-door", item: "거실 이동", collect: false },
   { room: "living", parts: [["슬리퍼", false], ["는 ", true], ["소파 ", false], ["앞에 있어요", true], [".", false]], target: "slippers", item: "슬리퍼" },
   { room: "living", parts: [["현관 쪽지", false], ["는 ", true], ["커튼 ", false], ["뒤에 있어요", true], [".", false]], target: "curtain", item: "현관 쪽지" },
   { room: "living", parts: [["현관문 열쇠", false], ["는 ", true], ["서랍 ", false], ["안에 있어요", true], [".", false]], target: "drawer", item: "현관문 열쇠" },
@@ -68,11 +71,22 @@ export function EscapeRoomGame() {
   const [escaped, setEscaped] = useState(false);
   const [mistakes, setMistakes] = useState(0);
   const [language, setLanguage] = useState<LanguageCode>("en");
+  const [recentItem, setRecentItem] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const collectionTimerRef = useRef<number | null>(null);
 
   const currentRoom = escaped ? "outside" : STEPS[stage].room;
   const activeTarget = started && !escaped ? STEPS[stage].target : "";
   const ui = UI_TRANSLATIONS[language];
+  const learnedSteps = [
+    ...STEPS.slice(0, escaped ? STEPS.length : stage),
+    ...(!escaped && revealed.includes(STEPS[stage].target) ? [STEPS[stage]] : []),
+  ];
+  const foundPositionWords = new Set(
+    POSITION_WORDS.filter((word) => learnedSteps.some((step) =>
+      step.parts.some(([text, isGrammar]) => isGrammar && text.includes(word)),
+    )),
+  );
 
   function nounLabel(korean: NounLabelKey, floating = false) {
     return (
@@ -86,7 +100,7 @@ export function EscapeRoomGame() {
   function playAudio(index: number | "success" | "try-again") {
     audioRef.current?.pause();
     const name = typeof index === "number" ? `clue-${index + 1}` : index;
-    const audio = new Audio(`/audio/${name}.mp3`);
+    const audio = new Audio(`/audio/${name}.mp3?v=${AUDIO_VERSION}`);
     audioRef.current = audio;
     void audio.play().catch(() => undefined);
   }
@@ -97,6 +111,9 @@ export function EscapeRoomGame() {
 
     if (!("collect" in currentStep) || currentStep.collect !== false) {
       setInventory((current) => [...current, currentStep.item]);
+      setRecentItem(currentStep.item);
+      if (collectionTimerRef.current !== null) window.clearTimeout(collectionTimerRef.current);
+      collectionTimerRef.current = window.setTimeout(() => setRecentItem(null), 900);
     }
 
     if (nextStage >= STEPS.length) {
@@ -195,21 +212,26 @@ export function EscapeRoomGame() {
     setIsListening(false);
     setEscaped(false);
     setMistakes(0);
+    setRecentItem(null);
+    if (collectionTimerRef.current !== null) window.clearTimeout(collectionTimerRef.current);
   }
 
   return (
     <main className="escape-app">
       <header className="topbar">
-        <div className="brand-heading">
-          <img src="/brand/onmaeum-korean-logo.png" alt="한국어교육AI연구개발원" />
-          <div>
+        <div className="brand-block">
           <p className="eyebrow">한국어 위치 표현 · 아파트 방탈출</p>
-          <h1>{escaped ? "집 밖" : ROOM_NAMES[STEPS[stage].room]}</h1>
+          <div className="brand-wordmark">
+            <img src="/brand/korean-edu-logo.png" alt="한국어교육AI연구개발원" />
+            <strong><span>KOREAN</span> <span>EDU</span></strong>
           </div>
         </div>
         <div className="top-instruction">
-          <strong>대화를 듣고 물건을 찾으세요</strong>
-          <small dir={language === "ar" ? "rtl" : "auto"}>{ui.instruction}</small>
+          <div className="instruction-copy">
+            <strong>대화를 듣고 물건을 찾으세요.</strong>
+            <small dir={language === "ar" ? "rtl" : "auto"}>{ui.instruction}</small>
+          </div>
+          <img className="teacher-mark" src="/brand/tk-teacher-original.png" alt="TK쌤" />
         </div>
         <div className="room-status">
           <label className="language-picker">
@@ -223,7 +245,9 @@ export function EscapeRoomGame() {
       </header>
 
       <section className="game-layout">
-        <aside className="mission-panel">
+        <aside className="mission-column">
+          <h1 className="room-title">{escaped ? "집 밖" : ROOM_NAMES[STEPS[stage].room]}</h1>
+          <div className="mission-panel">
           <div className="mission-heading">
             <span>{ui.currentClue}</span>
             <button type="button" className="listen-button" onClick={() => playAudio(stage)} disabled={!started || escaped}>
@@ -244,13 +268,16 @@ export function EscapeRoomGame() {
           {activeTarget === "keypad" ? (
             <div className="code-entry">
               <span>음성 비밀번호</span>
-              <button type="button" className={isListening ? "listening" : ""} data-testid="speak-password" onClick={listenForPassword}>
-                {isListening ? "듣고 있어요…" : `●  ${ui.speakPassword}`}
-              </button>
+              <div>
+                <button type="button" className="repeat-password" onClick={() => playAudio(stage)}>▶  315 다시 듣기</button>
+                <button type="button" className={isListening ? "listening" : ""} data-testid="speak-password" onClick={listenForPassword}>
+                  {isListening ? "듣고 있어요…" : `●  ${ui.speakPassword}`}
+                </button>
+              </div>
             </div>
           ) : null}
 
-          <p className="feedback" aria-live="polite">{!started && !escaped ? ui.initialMessage : message}</p>
+          <p className="feedback" key={message} aria-live="polite">{!started && !escaped ? ui.initialMessage : message}</p>
 
           <div className="map-panel" aria-label="집 구조도와 현재 위치">
             <div className="map-heading"><span>{ui.floorPlan}</span><b>● {ui.currentLocation}</b></div>
@@ -264,12 +291,19 @@ export function EscapeRoomGame() {
 
           <div className="inventory">
             <span>{ui.inventory}</span>
-            <div>{inventory.length ? inventory.map((item) => <b key={item}>{item}</b>) : <em>{ui.empty}</em>}</div>
+            <div>{inventory.length ? inventory.map((item) => <b className={item === recentItem ? "recent-item" : undefined} key={item}>{item}</b>) : <em>{ui.empty}</em>}</div>
           </div>
 
           <div className="learning-note">
             <span>{ui.positionWords}</span>
-            <p>위 · 아래 · 앞 · 뒤 · 옆 · 안 · 사이</p>
+            <p>
+              {POSITION_WORDS.map((word, index) => (
+                <span className={foundPositionWords.has(word) ? "found-position" : undefined} key={word}>
+                  {word}{index < POSITION_WORDS.length - 1 ? " · " : ""}
+                </span>
+              ))}
+            </p>
+          </div>
           </div>
         </aside>
 
@@ -327,6 +361,8 @@ export function EscapeRoomGame() {
               <button type="button" className="living-door object" aria-label="거실 문" onClick={() => inspect("living-door")}>{nounLabel("거실 문")}</button>
             </>
           ) : null}
+
+          {recentItem ? <div className="collection-toast" aria-hidden="true"><span>찾았어요</span><strong>{recentItem}</strong></div> : null}
 
           {!started ? (
             <div className="start-overlay"><div><span>ESCAPE HOME</span><h2>{ui.startTitle}</h2><p>{ui.startDescription}</p><button type="button" onClick={startGame}>{ui.start}</button></div></div>
