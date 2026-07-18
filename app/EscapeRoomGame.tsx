@@ -30,7 +30,7 @@ const ROOM_NAMES: Record<Room, string> = {
 };
 
 const POSITION_WORDS = ["위", "아래", "앞", "뒤", "옆", "안", "사이"] as const;
-const AUDIO_VERSION = "20260718-4";
+const AUDIO_VERSION = "20260718-5";
 
 const STEPS = [
   { room: "bedroom", parts: [["열쇠", false], ["는 ", true], ["책상 ", false], ["위에 있어요", true], [".", false]], target: "key", item: "열쇠" },
@@ -271,7 +271,7 @@ export function EscapeRoomGame() {
               <div>
                 <button type="button" className="repeat-password" onClick={() => playAudio(stage)}>▶  315 다시 듣기</button>
                 <button type="button" className={isListening ? "listening" : ""} data-testid="speak-password" onClick={listenForPassword}>
-                  {isListening ? "듣고 있어요…" : `●  ${ui.speakPassword}`}
+                  {isListening ? "듣고 있어요…" : "●  말하기"}
                 </button>
               </div>
             </div>

@@ -9,7 +9,7 @@ const LINES = [
   ["clue-2", "비밀번호 쪽지는 액자 뒤에 있어요.", "ko-KR-Standard-A"],
   ["clue-3", "방문 카드는 여행 가방 안에 있어요.", "ko-KR-Standard-A"],
   ["clue-4", "배터리는 침대 아래에 있어요.", "ko-KR-Standard-A"],
-  ["clue-5", "들어보세요. 삼백십오.", "ko-KR-Standard-A"],
+  ["clue-5", "들어보세요. 삼백십오. 비밀번호를 말하세요.", "ko-KR-Standard-A"],
   ["clue-6", "방문 옆에 있는 스위치를 누르세요.", "ko-KR-Standard-A"],
   ["clue-7", "휴대전화는 탁자 위에 있어요.", "ko-KR-Standard-C"],
   ["clue-8", "리모컨은 소파와 쿠션 사이에 있어요.", "ko-KR-Standard-C"],
@@ -22,7 +22,7 @@ const LINES = [
   ["clue-15", "현관 쪽지는 커튼 뒤에 있어요.", "ko-KR-Standard-C"],
   ["clue-16", "현관문 열쇠는 서랍 안에 있어요.", "ko-KR-Standard-C"],
   ["clue-17", "현관문은 책장 옆에 있어요.", "ko-KR-Standard-C"],
-  ["try-again", "들어보세요. 삼백십오.", "ko-KR-Standard-A"],
+  ["try-again", "들어보세요. 삼백십오. 비밀번호를 말하세요.", "ko-KR-Standard-A"],
   ["success", "축하합니다. 집 밖으로 탈출했습니다.", "ko-KR-Standard-C"],
 ];
 const REFRESH = new Set(["clue-3", "clue-5", "clue-6", "clue-13", "clue-16", "try-again", "success"]);
