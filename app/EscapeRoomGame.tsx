@@ -98,16 +98,11 @@ export function EscapeRoomGame() {
   }
 
   function playAudio(index: number | "success" | "try-again") {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.pause();
+    audioRef.current?.pause();
     const name = typeof index === "number" ? `clue-${index + 1}` : index;
-    audio.src = `/audio/${name}.mp3?v=${AUDIO_VERSION}`;
-    audio.currentTime = 0;
-    void audio.play().catch((error) => {
-      console.error("[audio] playback failed", error);
-    });
+    const audio = new Audio(`/audio/${name}.mp3?v=${AUDIO_VERSION}`);
+    audioRef.current = audio;
+    void audio.play().catch(() => undefined);
   }
 
   function advance() {
@@ -223,7 +218,6 @@ export function EscapeRoomGame() {
 
   return (
     <main className="escape-app">
-      <audio ref={audioRef} preload="auto" playsInline aria-hidden="true" />
       <header className="topbar">
         <div className="brand-block">
           <p className="eyebrow">한국어 위치 표현 · 아파트 방탈출</p>
