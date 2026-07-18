@@ -589,17 +589,7 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 560px) {
-  .escape-app { padding: 8px 8px 24px; }
-  .topbar {
-    align-items: start;
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    margin-bottom: 8px;
-    min-height: 0;
-    padding: 0 2px;
-  }
+  .topbar { align-items: start; }
   .eyebrow { font-size: 8px; letter-spacing: .08em; margin-bottom: 5px; text-align: left; }
   .brand-wordmark { gap: 7px; height: 48px; padding: 3px 8px; }
   .brand-wordmark img { height: 40px; width: 42px; }
@@ -607,26 +597,8 @@ button { -webkit-tap-highlight-color: transparent; }
   .top-instruction strong { font-size: 18px; }
   .language-picker select { max-width: 118px; width: 118px; }
   .room-status span { display: none; }
-  .game-layout { gap: 8px; }
-  .mission-column {
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    overflow: visible;
-  }
-  .room-title { font-size: 34px; margin: 0; padding: 4px 8px 9px; }
-  .mission-panel {
-    background: var(--hud-panel);
-    border: 1px solid var(--hud-line);
-    border-radius: 14px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, .24), inset 0 1px rgba(255, 255, 255, .035);
-    padding: 10px 12px;
-  }
-  .clue { margin: 8px 0 4px; min-height: 0; padding-bottom: 6px; }
-  .clue-translation { margin-bottom: 4px; min-height: 0; }
-  .feedback { margin: 3px 0 0; min-height: 0; }
-  .room-scene { aspect-ratio: 4 / 3; border-width: 3px; border-radius: 14px; }
+  .room-title { font-size: 34px; }
+  .room-scene { aspect-ratio: 4 / 3; }
   .map-panel { display: none; }
   .noun-label { padding: 4px 6px; }
   .window { left: 4%; width: 24%; }
