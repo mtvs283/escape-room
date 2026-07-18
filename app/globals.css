@@ -570,7 +570,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 @media (max-width: 900px) {
   body { overflow: auto; }
-  .escape-app { padding: 18px 12px 30px; }
+  .escape-app { height: auto; min-height: 100vh; padding: 18px 12px 30px; }
   .topbar { gap: 10px; grid-template-columns: minmax(0, 1fr) 118px; }
   .brand-block { min-width: 0; }
   .brand-wordmark { height: 54px; padding: 4px 10px; }
@@ -579,8 +579,8 @@ button { -webkit-tap-highlight-color: transparent; }
   .teacher-mark { display: none; }
   .top-instruction { grid-column: 1 / -1; grid-row: 2; }
   .room-status { grid-column: 2; grid-row: 1; }
-  .game-layout { grid-template-columns: 1fr; }
-  .mission-column { min-height: auto; }
+  .game-layout { flex: none; grid-template-columns: 1fr; max-height: none; }
+  .mission-column { min-height: auto; overflow: visible; }
   .room-title { font-size: 40px; margin: 0 0 10px; }
   .mission-panel { height: auto; min-height: auto; overflow: visible; padding: 18px; }
   .clue { min-height: auto; }
@@ -597,7 +597,8 @@ button { -webkit-tap-highlight-color: transparent; }
   .top-instruction strong { font-size: 18px; }
   .language-picker select { max-width: 118px; width: 118px; }
   .room-status span { display: none; }
-  .room-title { font-size: 34px; }
+  .room-title { font-size: 26px; margin: 0; padding: 10px 12px 9px; }
+  .room-title::before { margin-bottom: 4px; }
   .room-scene { aspect-ratio: 4 / 3; }
   .map-panel { display: none; }
   .noun-label { padding: 4px 6px; }
